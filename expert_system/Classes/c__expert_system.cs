@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace expert_system.Classes
 {
@@ -11,11 +12,77 @@ namespace expert_system.Classes
      */
     class c__expert_system
     {
-        //
-        // ...
-        // Поодключение к бд и сборка схемы хункционирования узлов
-        // ...
-        //
+        public List<c__terminal_node> l__terminal_node; // Список терминальных узлов
+
+        private List<c__intermidiate_node> l__intermidiate_node; // Список промежуточных узлов
+
+
+
+        /**
+         * Конструктор
+         * 
+         * @param  string  s__path_to_esd  Путь до файла, содержащего схему
+         */
+        public c__expert_system(string s__path_to_esd)
+        {
+            l__intermidiate_node = new List<c__intermidiate_node>(); // Установить список промежуточных узлов
+            l__terminal_node     = new List<c__terminal_node>();     // Установить список терминальных узлов
+
+
+            //
+            // Проверить существование файла схемы
+            //
+            if (File.Exists(s__path_to_esd) == false)
+            {
+                throw new FileNotFoundException(); // Сгенерировать исключение
+            }
+
+
+            string s__line; // Строка для работы с файлом
+
+            StreamReader sr__reader = new StreamReader(s__path_to_esd); // Открыть ридер файла схемы
+
+            //
+            // Построчно читать файл и создавать элементы
+            //
+            while ((s__line = sr__reader.ReadLine()) != null)
+            {
+                //
+                // Массив с данными из строки
+                // 
+                // 
+                //
+                //
+                //
+                //
+                //
+                Array a__s__data = s__line.Split('/');
+
+
+                //
+                // Если такой элемент не существует в списке, то создать его
+                //
+                if ()
+                {
+
+                }
+            }
+        }
+
+
+
+        /**
+         * Вычислить значение гипотезы
+         * 
+         * @return  double  Значение гипотезы
+         */
+        public double calculate()
+        {
+            double d__hypothesis_value; // Значение гипотезы
+
+
+            return d__hypothesis_value;
+        } 
     }
 
 
@@ -30,8 +97,9 @@ namespace expert_system.Classes
     {
         protected bool   boo__logical_value; // Логическое значение узла (да, нет)
         protected string s__description;     // Описание узла
-        protected byte   b__index;           // Индекс узла (его дентификатор)
+        protected byte   b__index;           // Индекс узла (его идентификатор)
         protected double d__weight;          // Вес узла
+        protected double d__value;           // Значение узла
 
         
 
@@ -79,6 +147,18 @@ namespace expert_system.Classes
         public byte get_index()
         {
             return b__index; // Вернуть индекс узла
+        }
+
+
+
+        /**
+         * Получить значение узла 
+         * 
+         * @return  double  Значение узла
+         */
+        public double get_value()
+        {
+            return d__value; // Вернуть значение узла
         }
     }
 
@@ -167,6 +247,9 @@ namespace expert_system.Classes
                     }
                 }
             }
+
+
+            calculate_value(); // Вычислить значение для узла
         }
 
 
@@ -174,9 +257,36 @@ namespace expert_system.Classes
         /**
          * Вычислить вес узла
          */
-        public void calculate_weight()
+        public void calculate_value()
         {
-            // ...
+            d__value = 0; // Обнулить значение узла 
+
+
+            //
+            // Если в дочерних узлах нет положительных, то выйти
+            //
+            if (l__node__childs.Where(o => o.get_logical_value() == false).Count() == 0)
+            {
+                return; // Выйти из функции
+            }
+
+
+            d__value += d__weight; // Добавить к значению вес узла
+
+
+            //
+            // Перебрать дочерние узлы с посчитать значение ротиельского
+            //
+            foreach (ac__node node__item in l__node__childs)
+            {
+                //
+                // Если дочерний узел положителен, то прибавить его значение к родителю
+                //
+                if (node__item.get_logical_value() == true)
+                {
+                    d__value += node__item.get_value(); // Прибавить значение 
+                }
+            }            
         }
     }
 
@@ -187,7 +297,7 @@ namespace expert_system.Classes
      * Класс терминального узла
      */
     class c__terminal_node:ac__node
-    {        
+    {
         /**
          * Конструктор
          * 
@@ -200,6 +310,28 @@ namespace expert_system.Classes
             b__index       = b__index_in;       // Установить индекс узла
             s__description = s__description_in; // Установить описание узла
             d__weight      = d__weight_in;      // Установить вес узла
-        }        
+        }
+
+
+
+        /**
+         * Установить входное значение
+         * 
+         * @param  int  i__value_in  Входное значение
+         */
+        public void set_value(int i__value_in)
+        {
+            //
+            // Если входное значение равно нулю, то узел негативен
+            //
+            if (i__value_in == 0)
+            {
+                d__value = 0; // Значение узла равно 0
+            }
+            else
+            {
+                d__value = i__value_in; // Значение равно параметру
+            }
+        }
     }
 }
