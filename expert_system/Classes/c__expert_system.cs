@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.IO;
 
@@ -14,7 +15,9 @@ namespace expert_system.Classes
     {
         public List<c__terminal_node> l__terminal_node; // Список терминальных узлов
 
-        private List<c__intermidiate_node> l__intermidiate_node; // Список промежуточных узлов
+        public List<c__intermidiate_node> l__intermidiate_node; // Список промежуточных узлов
+
+        private string s__path_to_esd; // Путь до файла схемы
 
 
 
@@ -23,10 +26,12 @@ namespace expert_system.Classes
          * 
          * @param  string  s__path_to_esd  Путь до файла, содержащего схему
          */
-        public c__expert_system(string s__path_to_esd)
+        public c__expert_system(string s__path_to_esd_in)
         {
             l__intermidiate_node = new List<c__intermidiate_node>(); // Установить список промежуточных узлов
             l__terminal_node     = new List<c__terminal_node>();     // Установить список терминальных узлов
+
+            s__path_to_esd = s__path_to_esd_in; // Установить путь до файла схемы
 
 
             //
@@ -50,23 +55,192 @@ namespace expert_system.Classes
                 //
                 // Массив с данными из строки
                 // 
-                // 
+                // [0] - "C" (промежуточный узел)   "Е" (терминальный узел)
+                // [1] - Индекс узла
+                // [2] - Описание узла
+                // [3] - Индекс промежуточного родительского узла
+                // [4] - Вес узла                
+                // [5] - Обратимость узла (1 - обратим, 0 - необратим)
                 //
-                //
-                //
-                //
-                //
-                Array a__s__data = s__line.Split('/');
+                string[] a__s__data = s__line.Split('/');
 
 
                 //
-                // Если такой элемент не существует в списке, то создать его
+                // Определить какой узел будет создан
                 //
-                if ()
+                if (a__s__data[0] == "C") // Создать промежуточный узел
                 {
+                    bool b__reversability; // Обратимость узла
 
+                    //
+                    // Установить значение обратимости узла
+                    //
+                    if (a__s__data[5] == "1")
+                    {
+                        b__reversability = true; // Установить обратимость
+                    }
+                    else
+                    {
+                        b__reversability = false; // Установить обратимость
+                    }
+
+
+
+                    create_intermidiate_node(
+                                                byte.Parse(a__s__data[1]),
+                                                a__s__data[2],
+                                                double.Parse(a__s__data[4]),
+                                                b__reversability
+                                            );
+                }
+                else // Создеать терминальный узел
+                {                    
+                    create_terminal_node(
+                                            byte.Parse(a__s__data[1]),
+                                            a__s__data[2],
+                                            double.Parse(a__s__data[4])
+                                        );
                 }
             }
+
+            sr__reader.Close(); // Закрыть ридер файла                    
+
+
+            make_relations(); // Построить связи между узлами
+        }
+
+
+
+        /**
+         * Создать терминальный узел
+         * 
+         * @param  byte    b__index_in        Индекс узла
+         * @param  string  s__description_in  Описание узла
+         * @param  double  d__weight_in       Вес узла
+         */
+        private void create_terminal_node(byte b__index_in, string s__description_in, double d__weight_in)
+        {
+            //
+            // Создать новый узел
+            //
+            c__terminal_node tn__new_node = new c__terminal_node(
+                                                                    b__index_in, 
+                                                                    s__description_in, 
+                                                                    d__weight_in
+                                                                );
+
+
+            l__terminal_node.Add(tn__new_node); // Добавить узел в список
+        }
+
+
+
+        /**
+         * Создать промежуточный узел
+         * 
+         * @param  byte    b__index_in            Индекс узла
+         * @param  string  s__description_in      Описание узла
+         * @param  double  d__weight_in           Вес узла
+         * @param  bool    boo__reversability_in  Обратимость узла
+         */
+        private void create_intermidiate_node(
+                                                byte b__index_in, 
+                                                string s__description_in, 
+                                                double d__weight_in, 
+                                                bool boo__reversability_in
+                                             )
+        {
+            //
+            // Создать новый узел
+            //
+            c__intermidiate_node in__new_node = new c__intermidiate_node(
+                                                                            b__index_in, 
+                                                                            s__description_in, 
+                                                                            d__weight_in,
+                                                                            boo__reversability_in                                                                          
+                                                                        );
+
+
+            l__intermidiate_node.Add(in__new_node); // Добавить узел в список
+        }
+
+
+
+        /**
+         * Построить связи между узлами
+         */
+        private void make_relations()
+        {
+            string s__line; // Строка для работы с файлом
+
+
+            //
+            // Создать связи для каждого промежуточного узла
+            //
+            foreach (c__intermidiate_node in__item in l__intermidiate_node)
+            {
+                List<ac__node> l__node__childs = new List<ac__node>(); // Список ссылок на узлы
+                
+
+                StreamReader sr__reader = new StreamReader(s__path_to_esd); // Открыть ридер файла схемы
+
+                //
+                // Построчно читать файл
+                //
+                while ((s__line = sr__reader.ReadLine()) != null)
+                {
+                    //
+                    // Массив с данными из строки
+                    // 
+                    // [0] - "C" (промежуточный узел)   "Е" (терминальный узел)
+                    // [1] - Индекс узла
+                    // [2] - Описание узла
+                    // [3] - Индекс промежуточного родительского узла
+                    // [4] - Вес узла                
+                    // [5] - Обратимость узла (1 - обратим, 0 - необратим)
+                    //
+                    string[] a__s__data = s__line.Split('/');
+
+
+                    //
+                    // Если узел не имеет связи, то перейти к следующей итерации
+                    //
+                    if (a__s__data[3] == "")
+                    {
+                        continue; // Переход к следующей итерации
+                    }
+
+                    
+                    //
+                    // Если есть связь, то добавить в список связей
+                    //
+                    if (byte.Parse(a__s__data[3]) == in__item.get_index())
+                    {
+                        //
+                        // Определить тип узла для добавления
+                        //
+                        if (a__s__data[0] == "C") // Промежуточный узел
+                        {
+                            //
+                            // Добавить в список соответвстующий узел
+                            //
+                            l__node__childs.Add(l__intermidiate_node.Where(o => o.get_index() == byte.Parse(a__s__data[1])).First());
+                        }
+                        else // Терминальный узел
+                        {
+                            //
+                            // Добавить в список соответвстующий узел
+                            //
+                            l__node__childs.Add(l__terminal_node.Where(o => o.get_index() == byte.Parse(a__s__data[1])).First());
+                        }
+                    }
+
+
+                    in__item.set_childs(l__node__childs);
+                }
+
+                sr__reader.Close(); // Закрыть ридер файла
+            }            
         }
 
 
@@ -78,10 +252,25 @@ namespace expert_system.Classes
          */
         public double calculate()
         {
-            double d__hypothesis_value; // Значение гипотезы
+            //
+            // Отсортировать промежуточные узлы по убыванию ключа
+            //
+            l__intermidiate_node = l__intermidiate_node.OrderByDescending(o => o.get_index()).ToList();
 
 
-            return d__hypothesis_value;
+            //
+            // Вычислить значение для каждого узла
+            //
+            foreach (c__intermidiate_node in__item in l__intermidiate_node)
+            {
+                in__item.calculate_logical_value(); // Вычислить значение узла
+            }
+
+            
+            //
+            // Вернуть значение гипотезы
+            //
+            return l__intermidiate_node.Where(o => o.get_index() == 0).First().get_value(); 
         } 
     }
 
@@ -160,6 +349,18 @@ namespace expert_system.Classes
         {
             return d__value; // Вернуть значение узла
         }
+
+
+
+        /**
+         * Получить вес узла 
+         * 
+         * @return  double  Вес узла
+         */
+        public double get_weight()
+        {
+            return d__weight; // Вернуть вес узла
+        }
     }
 
 
@@ -184,14 +385,34 @@ namespace expert_system.Classes
         /**
          * Конструктор
          * 
-         * @param  byte           b__index_in         Индекс узла
-         * @param  string         s__description_in   Описание узла
-         * @param  List<ac__node> l__node__childs_in  Список дочерних узлов  
+         * @param  byte            b__index_in            Индекс узла
+         * @param  string          s__description_in      Описание узла
+         * @param  double          d__weight_in           Вес узла 
+         * @param  bool            boo__reversability_in  Обратимость узла          
          */
-        public c__intermidiate_node(byte b__index_in, string s__description_in, List<ac__node> l__node__childs_in)
+        public c__intermidiate_node(
+                                        byte b__index_in, 
+                                        string s__description_in, 
+                                        double d__weight_in, 
+                                        bool boo__reversability_in
+                                   )
         {
-            b__index        = b__index_in;        // Установить индекс узла
-            s__description  = s__description_in;  // Установить описание узла
+            b__index           = b__index_in;           // Установить индекс узла
+            s__description     = s__description_in;     // Установить описание узла
+            l__node__childs    = new List<ac__node>();  // Установить список дочерних узлов
+            d__weight          = d__weight_in;          // Установить вес узла
+            boo__reversibility = boo__reversability_in; // Установить обратимость узла  
+        }
+
+
+
+        /**
+         * Установить список дочерних узлов
+         * 
+         * @param  List<ac__node>  l__node__childs_in  Лист дочерних узлов
+         */
+        public void set_childs(List<ac__node> l__node__childs_in)
+        {
             l__node__childs = l__node__childs_in; // Установить список дочерних узлов
         }
 
@@ -257,7 +478,7 @@ namespace expert_system.Classes
         /**
          * Вычислить вес узла
          */
-        public void calculate_value()
+        private void calculate_value()
         {
             d__value = 0; // Обнулить значение узла 
 
@@ -265,7 +486,7 @@ namespace expert_system.Classes
             //
             // Если в дочерних узлах нет положительных, то выйти
             //
-            if (l__node__childs.Where(o => o.get_logical_value() == false).Count() == 0)
+            if (l__node__childs.Where(o => o.get_logical_value() == false).Count() != 0)
             {
                 return; // Выйти из функции
             }
@@ -287,6 +508,18 @@ namespace expert_system.Classes
                     d__value += node__item.get_value(); // Прибавить значение 
                 }
             }            
+        }
+
+
+
+        /**
+         * Получить значение обратимости
+         * 
+         * @return  bool  Обратимость
+         */
+        public bool get_reversibility()
+        {
+            return boo__reversibility; // Вернуть значение обратимости
         }
     }
 
@@ -327,10 +560,14 @@ namespace expert_system.Classes
             if (i__value_in == 0)
             {
                 d__value = 0; // Значение узла равно 0
+
+                boo__logical_value = false;
             }
             else
             {
                 d__value = i__value_in; // Значение равно параметру
+
+                boo__logical_value = true;
             }
         }
     }

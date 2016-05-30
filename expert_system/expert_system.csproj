@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\c__data_grids.cs" />
     <Compile Include="Classes\c__expert_system.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

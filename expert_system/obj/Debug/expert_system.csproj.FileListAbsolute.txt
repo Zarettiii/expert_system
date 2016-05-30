@@ -1,1 +1,9 @@
 C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\bin\Debug\expert_system.exe.config
+C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\bin\Debug\expert_system.exe
+C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\bin\Debug\expert_system.pdb
+C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.csprojResolveAssemblyReference.cache
+C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.Form1.resources
+C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.Properties.Resources.resources
+C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.csproj.GenerateResource.Cache
+C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.exe
+C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.pdb
