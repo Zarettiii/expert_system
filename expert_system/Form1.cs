@@ -28,50 +28,13 @@ namespace expert_system
         {
             c__data_grids.left_data_grid(dgv_left);   // Настроить левый дата грид
             c__data_grids.right_data_grid(dgv_right); // Настроить правый дата грид
-        }
+        }        
 
 
 
-        private void btn_hypothesis_1_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                //
-                // Развернуть экспертную систему
-                //
-                es__hypothesis = new c__expert_system(@"hypotesis_1.esd");
-
-
-                write_grids();
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);                
-            }            
-        }
-
-
-
-        private void btn_hypothesis_2_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                //
-                // Развернуть экспертную систему
-                //
-                es__hypothesis = new c__expert_system(@"hypotesis_2.esd");
-
-
-                write_grids();
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
-        }
-
-
-
+        /**
+         * Заполнить таблицы данными из выбранной схемы
+         */
         private void write_grids()
         {
             foreach (c__intermidiate_node in__item in es__hypothesis.l__intermidiate_node)
@@ -100,6 +63,9 @@ namespace expert_system
 
 
 
+        /**
+         * Рассчитать ответ
+         */
         private void btn_calculate_Click(object sender, EventArgs e)
         {                    
             for (int i__1 = 0; i__1 < es__hypothesis.l__terminal_node.Count(); i__1++)
@@ -120,6 +86,66 @@ namespace expert_system
             }
 
             txt_result.Text = es__hypothesis.calculate().ToString(); // Вывести результат на форму
-        }        
+        }
+
+
+
+        /**
+         * Кнопка открытия окна выбора файла
+         */
+        private void btn_select_scheme_Click(object sender, EventArgs e)
+        {
+            ofd_select_scheme.FileName = @"*.esd"; // Укакзать начальное имя файла для окна выбора
+
+            //
+            // Указать директорию, которая будет открыта в окне
+            //
+            ofd_select_scheme.InitialDirectory = Application.ExecutablePath; 
+
+
+            ofd_select_scheme.ShowDialog(); // Показать окно выбора файла
+        }
+
+
+
+        /**
+         * При выборе файла в окне выбора файла
+         */
+        private void ofd_select_scheme_FileOk(object sender, CancelEventArgs e)
+        {            
+            try
+            {
+                //
+                // Очистить таблицы
+                //
+                dgv_left.Rows.Clear();
+                dgv_right.Rows.Clear();
+
+
+                //
+                // Развернуть экспертную систему
+                //
+                es__hypothesis = new c__expert_system(ofd_select_scheme.FileName);
+
+
+                write_grids(); //  Заполнить таблицы
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+        }
+
+
+
+        /**
+         * Кнопка создания новой схемы
+         */
+        private void btn_create_scheme_Click(object sender, EventArgs e)
+        {
+            form_create_scheme form__create_scheme = new form_create_scheme(); // Создать экземпляр формы
+
+            form__create_scheme.Show(); // Показать форму
+        }
     }
 }

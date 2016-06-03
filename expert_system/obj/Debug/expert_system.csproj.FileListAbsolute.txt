@@ -7,3 +7,4 @@ C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_sys
 C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.csproj.GenerateResource.Cache
 C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.exe
 C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.pdb
+C:\Users\sxsmd\Documents\GitHub\expert_system\expert_system\obj\Debug\expert_system.form_create_scheme.resources
